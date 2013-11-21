@@ -1,18 +1,38 @@
 <?php
 
+/*
+ * A simple logger which stores all GET requests to a sqlLite db as key/value pairs
+ * 
+ * Usage:
+ * 
+ * Log values
+ * <SERVER ADDR>/?temp=15&humidity=50&volume=11
+ * 
+ * Clear the db
+ * <SERVER ADDR>/?clear
+ * 
+ * Note - Only for testing and debuging, no security or input sanitation etc.
+ * 
+ */
+
+
+
+
 $db = new PDO('sqlite:logger.sqlite');
 
 if(ISSET($_GET['clear'])){
+	
 	echo "data Cleared";
+	
 	$db->exec("DELETE FROM logs");
+	
 }else{
 
 	$db->exec("CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY  NOT NULL  UNIQUE  check(typeof(id) = 'integer') , key VARCHAR, value , time );");
 
-	foreach($_GET as $key => $value)
-	{
-
-		$now = time();
+	$now = time();
+	
+	foreach($_GET as $key => $value){
 
 		$db->exec("INSERT INTO logs (key, value, time) VALUES ('$key', '$value', '$now');");
 
@@ -22,9 +42,13 @@ if(ISSET($_GET['clear'])){
 	$sql = "SELECT * FROM logs;";
 
 	$rs = $db->query($sql);
+	
 	if (!$rs) {
+		
 		echo "An SQL error occured.\n";
+		
 		exit;
+		
 	}
 
 	echo'<table>
@@ -49,12 +73,7 @@ if(ISSET($_GET['clear'])){
 
 	echo'<table>';
 
-
-
 }
-
-
-
 
 $db = NULL;
 
